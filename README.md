@@ -26,7 +26,7 @@ LLM → appelle generate_image(prompt="...", aspect_ratio="16:9")
 | **Mémoire** | 16 GB | 32+ GB |
 | **Disque** | 15 GB libres | 20+ GB |
 | **macOS** | 13+ | 15+ |
-| **LM Studio** | 0.3.18+ | dernière version |
+| **LM Studio** | 0.4.6+ | dernière version |
 
 ### Budget mémoire indicatif
 
