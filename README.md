@@ -41,13 +41,13 @@ LLM → appelle generate_image(prompt="...", aspect_ratio="16:9")
 ### Méthode rapide (une seule commande)
 
 ```bash
-curl -sSL https://raw.githubusercontent.com/VOTRE_REPO/z-image-mcp/main/install.sh | bash
+curl -sSL https://raw.githubusercontent.com/ctheory/z-image-mcp/main/install.sh | bash
 ```
 
 ### Méthode manuelle
 
 ```bash
-git clone https://github.com/VOTRE_REPO/z-image-mcp.git
+git clone https://github.com/ctheory/z-image-mcp.git
 cd z-image-mcp
 chmod +x install.sh
 ./install.sh
