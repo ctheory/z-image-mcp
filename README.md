@@ -128,7 +128,7 @@ Les images sont sauvées dans `~/Pictures/z-image-mcp/` au format PNG.
 
 ### Augmenter la VRAM GPU (macOS)
 
-Par défaut, macOS ne donne que ~66% de la RAM au GPU. Pour augmenter :
+Par défaut, macOS ne donne que ~78% de la RAM au GPU. Pour augmenter :
 
 ```bash
 # Exemple pour un Mac 36 GB → 32 GB pour le GPU
