@@ -23,7 +23,7 @@ LLM → appelle generate_image(prompt="...", aspect_ratio="16:9")
 | | Minimum | Recommandé |
 |---|---|---|
 | **Mac** | Apple Silicon (M1+) | M3/M4 Pro/Max |
-| **Mémoire** | 16 GB | 32+ GB |
+| **Mémoire** | 36 GB | 36+ GB |
 | **Disque** | 15 GB libres | 20+ GB |
 | **macOS** | 13+ | 15+ |
 | **LM Studio** | 0.4.6+ | dernière version |
