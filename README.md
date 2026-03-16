@@ -64,6 +64,20 @@ L'installateur :
 8. ✅ Lance un test de génération
 
 ## Utilisation
+## Activation de MCP dans LM Studio
+
+Après l'installation, vous devez vérifier que MCP est activé dans LM Studio :
+
+1. Ouvrez **LM Studio** (ou relancez-le si déjà ouvert)
+2. Cliquez sur l'onglet **Program** (icône terminal, barre latérale droite)
+3. Dans la section **Install**, vérifiez que **z-image** apparaît dans la liste des serveurs MCP
+4. Un point vert à côté de **z-image** indique que le serveur est connecté
+5. Si le point est rouge, cliquez sur le bouton **refresh** (🔄) pour relancer le serveur
+6. Dans le panneau de chat, vérifiez que les outils sont visibles : cliquez sur l'icône **outils** (🔧) sous la zone de saisie — vous devriez voir `generate_image`, `preload_model`, `unload_model`, etc.
+7. Chargez un modèle compatible **tool-calling** (Qwen 3.5 4B ou 9B recommandé)
+8. Lors du premier appel d'outil, LM Studio affichera une **fenêtre de confirmation** avec les paramètres — cliquez **Allow** pour exécuter
+
+> **Note :** Si vous ne voyez pas les outils, vérifiez que votre version de LM Studio est ≥ 0.3.18 et que le fichier `~/.lmstudio/mcp.json` contient bien l'entrée `z-image`.
 
 ### Premiers pas
 
