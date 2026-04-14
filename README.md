@@ -5,7 +5,7 @@ sur **macOS Apple Silicon** via [MLX](https://github.com/ml-explore/mlx) natif.
 
 Deux modes d'utilisation :
 - **LM Studio + MCP** — demandez à votre LLM local de générer des images
-- **Interface Gradio** — génération directe sans LLM, sans swap mémoire
+- **Interface Gradio** — génération directe sans LLM, moins de swap mémoire
 
 > Sans ComfyUI, sans cloud, sans API payante. 2x plus rapide que diffusers/PyTorch.
 
