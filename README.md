@@ -1,44 +1,27 @@
 # z-image-mcp
 
-**Génération d'images locale** avec [Z-Image-Turbo](https://github.com/Tongyi-MAI/Z-Image) (6B) 
-pilotée par un LLM local dans [LM Studio](https://lmstudio.ai) via le protocole [MCP](https://modelcontextprotocol.io).
+**Génération d'images locale** avec [Z-Image-Turbo](https://github.com/Tongyi-MAI/Z-Image) (6B)
+sur **macOS Apple Silicon** via [MLX](https://github.com/ml-explore/mlx) natif.
 
-> Demandez à votre LLM local de générer des images — sans ComfyUI, sans cloud, sans API payante.
+Deux modes d'utilisation :
+- **LM Studio + MCP** — demandez à votre LLM local de générer des images
+- **Interface Gradio** — génération directe sans LLM, sans swap mémoire
 
-## Démonstration
-
-Dans le chat LM Studio :
-
-```
-Toi : « Génère une image photoréaliste d'un lever de soleil sur Mars,
-        avec des rochers rouges au premier plan, volumetric lighting, cinematic, en 16:9 »
-
-LLM → appelle generate_image(prompt="...", aspect_ratio="16:9")
-    → Z-Image-Turbo génère l'image en ~30s
-    → "Image générée ! Fichier : ~/Pictures/z-image-mcp/zimage_20260315_143022_42.png"
-```
+> Sans ComfyUI, sans cloud, sans API payante. 2x plus rapide que diffusers/PyTorch.
 
 ## Prérequis
 
-| | Minimum | Recommandé |
+|  | Minimum | Recommandé |
 |---|---|---|
 | **Mac** | Apple Silicon (M1+) | M3/M4 Pro/Max |
-| **Mémoire** | 36 GB | 36+ GB |
-| **Disque** | 15 GB libres | 20+ GB |
-| **macOS** | 13+ | 15+ |
-| **LM Studio** | 0.4.6+ | dernière version |
-
-### Budget mémoire indicatif
-
-| Config LM Studio | + Z-Image | Total pic | Résolution max |
-|---|---|---|---|
-| Qwen 3.5 4B Q4 (~2.5 GB) | ~17 GB | ~20 GB | 1280×720 |
-| Qwen 3.5 9B Q4 (~5.5 GB) | ~17 GB | ~23 GB | 1280×720 |
-| Qwen 3.5 35B-A3B Q4 (~20 GB) | ~17 GB | ~37 GB | 512×512 |
+| **Mémoire** | 36 GB | 48+ GB |
+| **Disque** | 20 GB libres | 30+ GB |
+| **macOS** | 14+ | 15+ |
+| **LM Studio** | 0.3.18+ | dernière version |
 
 ## Installation
 
-### Méthode rapide (une seule commande)
+### Méthode rapide
 
 ```bash
 curl -sSL https://raw.githubusercontent.com/ctheory/z-image-mcp/main/install.sh | bash
@@ -54,117 +37,131 @@ chmod +x install.sh
 ```
 
 L'installateur :
-1. ✅ Vérifie votre système (macOS, Apple Silicon, mémoire)
-2. ✅ Installe Python 3.12 si nécessaire (via Homebrew)
-3. ✅ Crée un environnement virtuel isolé
-4. ✅ Installe PyTorch, diffusers, MCP SDK
-5. ✅ Recommande une résolution selon votre mémoire
-6. ✅ Configure automatiquement `mcp.json` pour LM Studio
-7. ✅ Propose d'ajuster la limite GPU VRAM
-8. ✅ Lance un test de génération
+1. Vérifie votre système (macOS, Apple Silicon, 36 GB+ RAM)
+2. Clone [z-image-turbo-mlx](https://github.com/FiditeNemini/z-image-turbo-mlx)
+3. Installe MLX et les dépendances
+4. Convertit le modèle en format MLX quantifié
+5. Configure `mcp.json` pour LM Studio
+6. Crée un raccourci Gradio sur le bureau
+7. Lance un test de génération
 
 ## Utilisation
-## Activation de MCP dans LM Studio
 
-Après l'installation, vous devez vérifier que MCP est activé dans LM Studio :
+### Mode 1 : LM Studio + MCP
 
-1. Ouvrez **LM Studio** (ou relancez-le si déjà ouvert)
-2. Cliquez sur l'onglet **Program** (icône terminal, barre latérale droite)
-3. Dans la section **Install**, vérifiez que **z-image** apparaît dans la liste des serveurs MCP
-4. Un point vert à côté de **z-image** indique que le serveur est connecté
-5. Si le point est rouge, cliquez sur le bouton **refresh** (🔄) pour relancer le serveur
-6. Dans le panneau de chat, vérifiez que les outils sont visibles : cliquez sur l'icône **outils** (🔧) sous la zone de saisie — vous devriez voir `generate_image`, `preload_model`, `unload_model`, etc.
-7. Chargez un modèle compatible **tool-calling** (Qwen 3.5 4B ou 9B recommandé)
-8. Lors du premier appel d'outil, LM Studio affichera une **fenêtre de confirmation** avec les paramètres — cliquez **Allow** pour exécuter
+1. Ouvrez **LM Studio** (ou relancez-le après installation)
+2. Vérifiez dans **Program** que **z-image** apparaît avec un point vert
+3. Chargez un modèle avec tool-calling (**Qwen 3.5 4B** ou **9B**)
+4. Demandez : *« Génère un paysage martien en 16:9 »*
 
-> **Note :** Si vous ne voyez pas les outils, vérifiez que votre version de LM Studio est ≥ 0.3.18 et que le fichier `~/.lmstudio/mcp.json` contient bien l'entrée `z-image`.
+LM Studio affichera une confirmation avant l'exécution — cliquez **Allow**.
 
-### Premiers pas
+> **Note :** Avec LM Studio, un léger swap temporaire (~5 GB) est normal
+> pendant la génération car le LLM et Z-Image partagent la mémoire.
+> Le swap disparaît après la génération.
 
-1. Ouvrez (ou relancez) **LM Studio**
-2. Chargez un modèle avec **tool-calling** :
-   - **Qwen 3.5 4B** (16 GB de RAM) — suffisant pour piloter les images
-   - **Qwen 3.5 9B** (32+ GB) — meilleure qualité de prompting
-3. Premier message : **« Précharge le modèle d'image »**
-4. Puis : **« Génère un chat cosmique en 16:9 »**
+### Mode 2 : Interface Gradio (pas de swap)
+
+Double-cliquez **Z-Image** sur le bureau. Ou en terminal :
+
+```bash
+cd ~/z-image-turbo-mlx
+source .venv/bin/activate
+python app.py
+```
+
+L'interface s'ouvre dans le navigateur sur `http://127.0.0.1:7860`.
 
 ### Presets de résolution
 
-| Preset | Résolution | Temps (~M4) | Usage |
-|---|---|---|---|
-| `1:1` | 512×512 | ~30s | Rapide, avatar |
-| `16:9` | 640×368 | ~25s | Paysage |
-| `9:16` | 368×640 | ~25s | Portrait, mobile |
-| `4:3` | 576×432 | ~28s | Photo classique |
-| `hd_1:1` | 1024×1024 | ~2-3 min | Haute qualité |
-| `hd_16:9` | 1280×720 | ~90s | Cinématique |
-| `hd_9:16` | 720×1280 | ~90s | Affiche verticale |
+| Preset | Résolution | Temps (~M4) |
+|---|---|---|
+| `1:1` | 1024×1024 | ~60s |
+| `16:9` | 1280×720 | ~45s |
+| `9:16` | 720×1280 | ~45s |
+| `4:3` | 1152×864 | ~50s |
+| `3:4` | 864×1152 | ~50s |
 
-### Outils MCP disponibles
+### Outils MCP (LM Studio)
 
 | Outil | Description |
 |---|---|
-| `preload_model` | Charge le modèle en mémoire (évite le timeout au 1er appel) |
 | `generate_image` | Génère une image depuis un prompt texte |
-| `unload_model` | Libère la mémoire (modèle rechargé automatiquement ensuite) |
 | `get_status` | État du serveur |
-| `list_generated_images` | Historique des images générées |
+| `list_generated_images` | Historique des images |
 
 ### Conseils de prompting
 
-Z-Image-Turbo est très littéral. Pour de bons résultats :
-
-- **Soyez spécifique** : décrivez le sujet, la pose, les vêtements, le fond, l'éclairage
+- **Soyez spécifique** : décrivez sujet, pose, vêtements, fond, éclairage
 - **Mots-clés qualité** : `volumetric lighting`, `cinematic`, `4k`, `studio softbox`
-- **Photo-réalisme** : ajoutez `photorealistic`, `DSLR photo`, `35mm film`
+- **Photo-réalisme** : `photorealistic`, `DSLR photo`, `35mm film`
 - **Styles** : `oil painting`, `watercolor`, `pixel art`, `anime`
-- **Bilingue** : le modèle comprend l'anglais et le chinois
-
-### Images
-
-Les images sont sauvées dans `~/Pictures/z-image-mcp/` au format PNG.
+- **Accélération** : ajoutez `cache: fast` pour ~30% de speedup (LeMiCa)
+- **Bilingue** : anglais et chinois supportés
 
 ## Optimisation mémoire
 
-### Augmenter la VRAM GPU (macOS)
-
-Par défaut, macOS ne donne que ~78% de la RAM au GPU. Pour augmenter :
+### Augmenter la VRAM GPU
 
 ```bash
-# Exemple pour un Mac 36 GB → 32 GB pour le GPU
+# Mac 36 GB → 32 GB pour le GPU
 sudo sysctl iogpu.wired_limit_mb=32768
 ```
 
-Relancez LM Studio après. Ce réglage se réinitialise au redémarrage.
+Se réinitialise au redémarrage. Pour le rendre permanent :
 
-### Réduire la pression mémoire
+```bash
+sudo tee /Library/LaunchDaemons/com.gpu.vram.plist > /dev/null << 'EOF'
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0"><dict>
+<key>Label</key><string>com.gpu.vram</string>
+<key>ProgramArguments</key><array>
+<string>/usr/sbin/sysctl</string><string>iogpu.wired_limit_mb=32768</string>
+</array><key>RunAtLoad</key><true/>
+</dict></plist>
+EOF
+```
 
-- Utilisez **Qwen 3.5 4B** au lieu de 9B quand vous générez des images
-- Restez en résolution **standard** (pas hd_) sur les Mac ≤ 32 GB
-- Fermez les navigateurs et apps lourdes pendant la génération
-- Après la génération, demandez : **« Décharge le modèle d'image »**
+### Réduire le swap avec LM Studio
 
-## Limitations
+- Utilisez **Qwen 3.5 4B** au lieu de 9B pendant les générations
+- Fermez Chrome et les apps lourdes
+- Pour 0 swap : utilisez le mode Gradio (sans LM Studio)
 
-- **LM Studio n'affiche pas les images dans le chat** — le LLM retourne le chemin du fichier
-- Le **text encoder Qwen3-4B est obligatoire** dans le pipeline de diffusion — il ne peut pas être remplacé par le LLM de LM Studio
-- `guidance_scale` doit rester à **0.0** pour Z-Image-Turbo (modèle distillé)
-- Le premier appel est plus lent (~30s supplémentaires) — utilisez `preload_model`
+## Architecture
+
+```
+┌─ Mode 1 : LM Studio ─────────────────────────────┐
+│  LM Studio (Qwen 3.5) ──MCP stdio──▶ server.py   │
+│       server.py ──subprocess──▶ generate_mlx.py   │
+│           → image PNG sauvée                      │
+│           → mémoire MLX libérée                   │
+└───────────────────────────────────────────────────┘
+
+┌─ Mode 2 : Gradio ────────────────────────────────┐
+│  Navigateur ──▶ app.py (Gradio UI)               │
+│       → generate_mlx.py                          │
+│       → image PNG sauvée                         │
+└───────────────────────────────────────────────────┘
+```
 
 ## Désinstallation
 
 ```bash
-rm -rf ~/z-image-mcp
+rm -rf ~/z-image-mcp ~/z-image-turbo-mlx ~/models
+rm -f ~/Desktop/Z-Image.command
+rm -rf ~/.cache/huggingface
+# Retirez "z-image" de ~/.lmstudio/mcp.json
 ```
-
-Puis retirez l'entrée `"z-image"` de `~/.lmstudio/mcp.json`.
 
 ## Crédits
 
 - [Z-Image-Turbo](https://github.com/Tongyi-MAI/Z-Image) par Alibaba Tongyi Lab (Apache 2.0)
-- [LM Studio](https://lmstudio.ai) par LM Studio, Inc.
+- [z-image-turbo-mlx](https://github.com/FiditeNemini/z-image-turbo-mlx) par FiditeNemini
+- [MLX](https://github.com/ml-explore/mlx) par Apple
+- [LM Studio](https://lmstudio.ai)
 - [MCP](https://modelcontextprotocol.io) par Anthropic
-- [diffusers](https://github.com/huggingface/diffusers) par Hugging Face
 
 ## Licence
 
